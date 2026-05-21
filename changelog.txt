@@ -1,0 +1,49 @@
+###ClaudeChatgpt
+###3.19MB – PYTHON
+###65313 LINES
+
+
+
++ Добавлена parity-обработка inline `@bot c` с обычной `.c`.
++ Inline `@bot c` теперь может выполнять TG bridge fallback, pure JSON bridge actions, `session.flow.run`, read-action finalization, `send_file_action`, `send_file_actions` и отправку generated files.
++ Inline `@bot c` теперь поддерживает reply context: `reply_to_source:true` указывает на replied message, `reply_user` / `reply_sender` указывает на автора replied message, если он resolvable.
++ Добавлен fallback для inline reply context: если opaque `inline_message_id` не раскрывается в chat/message, модуль сканирует свежие inline-сообщения userbot-клиентом по prompt/`via_bot_id` и достаёт `reply_to_msg_id` от найденного сообщения.
++ Inline reply context теперь использует `reply_to_message`, `reply_to`, `reply_to_msg_id`, `reply_to_message_id`, `reply_to_peer_id`, `reply_to_top_id` и quote text, если они доступны в callback/message объектах.
++ Добавлен prompt note для inline reply: модель видит, что можно использовать `reply_to_source=true` и `reply_user/reply_sender`.
++ Добавлены безопасные TG bridge read/actions:
++ `session.message.get` / `session.messages.get` / `session.message.read`.
++ `session.message.link` / `session.message.links`.
++ `session.message.replies` / `session.message.thread` / `session.message.comments`.
++ `session.message.reactions.list` / `session.message.reactors`.
++ `session.message.pinned.list` / `session.pinned.list`.
++ Добавлены `telegram_*` aliases для новых TG bridge actions.
++ Добавлены dispatch handlers для новых TG bridge actions.
++ Добавлены catalog entries для `.ctgbridge` по новым actions.
++ Добавлены compact examples в TG bridge prompt для новых actions.
++ Новые read actions сохраняют найденные сообщения в `last_bridge_search` для follow-up команд.
++ `session.flow.run` / `telegram_smart_flow` теперь доступен в режиме `lookup` как безопасный orchestration wrapper для read-only действий.
++ Inline `@bot c` теперь после auto-start отправляет финальный ответ отдельным inline-form сообщением с кнопками как у обычной `.c`, если source message удалось определить.
++ Process-card inline `@bot c` удаляется после успешной доставки финального inline-form ответа.
++ Добавлена fallback-кнопка `Start manually` / `Запустить вручную`, которая нужна только если Telegram не прислал chosen-inline событие.
++ Улучшен дизайн inline-карточек `c` и `cimg`: добавлена route-таблица снизу с auto-start flow и доставкой результата.
+
+- Убрана зависимость inline `@bot c` от старого text-only поведения для file/TG delivery tasks.
+- Убрана опасность stale `reply_user`: если текущий reply context есть, но автора нельзя определить, старый remembered user больше не подставляется автоматически.
+- Не добавлялись опасные действия: session export, raw auth/session access, 2FA/secrets, account deletion, обход Telegram security.
+- Убран fallback auto-start через scan/request id; inline `c/cimg` снова запускается автоматически только через `chosen_inline_result`, manual button остаётся fallback.
+
+• Доработан обычный встроенный prompt: inline `@bot c` теперь явно считается равным `.c` по правам на `shell`, `web`, files и TG bridge.
+• Доработан ChatGPT agent prompt: модель не должна отказываться от shell/TG bridge действий только из-за inline mode.
+• Доработан Web/tool prompt: если пользователь просит run/check/ping/print/list/inspect/server state, модель должна вызвать настоящий `shell`, а не симулировать output.
+• Доработан TG bridge prompt routing: read exact messages, get links, replies/comments/thread, reactions/reactors, pinned messages теперь маршрутизируются в новые actions.
+• Доработан обычный `.c` reply context: context сохраняется даже если sender не резолвится полностью.
+• Доработана inline side-effect обработка: теперь используется общий набор bridge/file fallback logic, близкий к обычной `.c`.
+• Доработан `resolve_inline_message_id`: теперь поддерживаются tuple/list/object variants и fallback scan, потому что Bot API inline ids часто opaque и не содержат chat/reply напрямую.
+• Доработан inline context resolver: сначала берёт данные из callback/message объекта, затем пробует `resolve_inline_message_id`, затем fallback scan.
+• `chosen_inline_result` теперь помечает matching pending request как started, чтобы fallback-кнопка не запускала дубль после автостарта.
+• Inline финал больше не отправляется через userbot client, когда нужны Python callback-кнопки: для кнопок используется `inline.form`, иначе fallback остаётся edit inline message.
+• Manual fallback button защищён от дублей: если auto-start уже запустил request через `chosen_inline_result`, повторное нажатие отвечает `Already started`.
+• Вложенные шаги `session.flow.run` всё равно проверяются по текущему TG bridge mode, поэтому `lookup` не становится bypass для send/manage/full действий.
+• Доработан prompt для TG bridge observations: модель должна разделять факты по типам, а не смешивать профильные данные с сообщениями/поведением.
+• Добавлена таксономия bridge-фактов: profile/identity, chat context/role, messages/content, activity/behavior, media/reactions, admin/permissions/system facts, access limits.
+• Уточнено: никнейм/display name/username/bio/status/photo count относятся к профилю; стиль речи/словарь/частота сообщений относятся к activity/messages; роль/права/common chats относятся к chat context.
